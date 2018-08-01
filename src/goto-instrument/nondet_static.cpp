@@ -17,6 +17,7 @@ Date: November 2011
 #include <goto-programs/goto_model.h>
 
 #include <linking/static_lifetime_init.h>
+#include <util/suffix.h>
 
 void nondet_static(
   const namespacet &ns,
@@ -40,6 +41,20 @@ void nondet_static(
 
       // is it a __CPROVER_* variable?
       if(has_prefix(id2string(sym.get_identifier()), CPROVER_PREFIX))
+        continue;
+
+      // is it @inflight_exception?
+      if(sym.get_identifier() == "java::@inflight_exception")
+        continue;
+
+      // is it any of ..$clinit_already_run?
+      if(has_suffix(id2string(sym.get_identifier()), "::clinit_already_run"))
+        continue;
+
+      // is it a java.lang.String.Literal?
+      if(
+        has_prefix(
+          id2string(sym.get_identifier()), "java::java.lang.String.Literal"))
         continue;
 
       // static lifetime?
